@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Home</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="home.html">E-Commerce</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Categorys
+                </a>
+                <ul  class="dropdown-menu">
+                  <li><a id="cate" class="dropdown-item" href="#">electronics</a></li>
+                  <li><a id="cate" class="dropdown-item" href="#">jewelery</a></li>
+                  <li><a id="cate" class="dropdown-item" href="#">men's clothing</a></li>
+                  <li><a id="cate" class="dropdown-item" href="#">women's clothing</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a id="ReturnAll" class="dropdown-item" href="#">Show me all products</a></li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a id="reg-form" class="nav-link" href="#">Register</a>
+              </li>
+              <li class="nav-item">
+                <a style="display: none;" id="sh-card" class="nav-link" href="#">Card <i class="bi bi-1-circle-fill"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <br/><br/>
+      <h2 id="titulli" style="text-align: center; margin-bottom: 15px;">All Products</h2>
+      <br/>
+      <section id="products" class="pb-4">
+        <div class="container">
+        </div>
+      </section>
+      <div id="d-card" style="display: none; position: absolute; top: 10%; right: 0; width: 300px;height:auto; background-color: rgb(249, 239, 239);">
+        <div>jsdkf</div>
+      </div>
+  
+  
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+      <script src="./node_modules/axios/dist/axios.min.js"></script>
+      <script src="/js/dynamicListener.min.js"></script>
+      <script type="module">
+        import {Products} from "/Products.js"
+        import{returnId} from "/Details.js"
+        import{Bill} from "/Bill.js"
+        import{registerForm} from "/RegisterForm.js"
+          
+            axios.get('https://fakestoreapi.com/products')
+            .then(res=>{
+                const products = res.data
+                document.querySelector('#products > div').innerHTML = Products(products)
+
+                document.getElementById('ReturnAll').addEventListener('click',()=>{
+                  const titulli = document.getElementById('titulli').innerText = 'All Products'
+                  const products = res.data
+                  document.querySelector('#products > div').innerHTML = Products(products)
+                })
+            })
+            .catch(rej=>console.log(rej))
+
+
+            document.querySelectorAll('#cate').forEach(drop => drop.addEventListener('click', e=>{
+              e.preventDefault()
+              const titulli = document.getElementById('titulli').innerText = e.target.innerText.charAt(0).toUpperCase() + e.target.innerText.slice(1)
+              axios.get(`https://fakestoreapi.com/products/category/${e.target.innerText}`)
+              .then(res=>{
+                const products = res.data
+                document.querySelector('#products > div').innerHTML = Products(products)
+              })
+              .catch(rej=>console.log(rej))
+            }))
+
+            addDynamicEventListener(document.body, 'click', '#more', e => {
+              e.preventDefault()
+            
+              const elem = e.target
+              const id = Array.from(elem.children[0].innerText) 
+
+              axios.get(`https://fakestoreapi.com/products/${id[0]}`)
+              .then(res=>{
+                const products = res.data
+                document.querySelector('#products > div').innerHTML = returnId(products)
+                const titulli = document.getElementById('titulli').innerText = res.data.title
+
+
+                addDynamicEventListener(document.body, 'click', '#add-card', e => {
+                e.preventDefault()
+                document.querySelector('#d-card').innerHTML = Bill(products)
+                const card =document.getElementById('sh-card')
+                card.style.display = 'block'
+                card.addEventListener( 'click', e => {
+                  document.getElementById('d-card').style.display='block'
+                })
+                addDynamicEventListener(document.body, 'click', '#order', e => {
+                  const name= document.querySelector('#p-title').innerText
+                  const price= document.querySelector('#p-price').innerText
+
+                  const Order = {
+                    Name:name,
+                    Price:price
+                  }
+                  localStorage.setItem('Order', JSON.stringify(Order));
+                    alert('Order data saved to local storage.')
+                    document.getElementById('d-card').style.display='none'
+                })
+
+                })
+                })
+                  .catch(rej=>console.log(rej))
+
+                })
+                document.getElementById('reg-form').addEventListener('click',()=>{
+                  document.querySelector('#products > div').innerHTML = registerForm()
+                })
+                addDynamicEventListener(document.body, 'click', '#submit', e => {
+                  e.preventDefault()
+                  const username =document.querySelector('#username').value
+                  const email =document.querySelector('#email').value
+                  const password =document.querySelector('#password').value
+                  const confPassword =document.querySelector('#confirmPassword').value
+
+                  if(password !== confPassword){
+                    alert('Your passwords dont match')
+                  }else{
+                    const registrationData = {
+                    username: username,
+                    email: email,
+                    password: password,
+                    confirmPassword: confPassword
+                    };
+                    localStorage.setItem('registrationData', JSON.stringify(registrationData));
+                    alert('Registration data saved to local storage.')
+                  }
+                })
+
+      </script>
+</body>
+</html>
