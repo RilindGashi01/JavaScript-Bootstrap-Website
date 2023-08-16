@@ -17,7 +17,7 @@ export function Bill(products){
                             <th class="text-right">Price</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tbody">
                         <tr>
                             <td id="p-title">${products.title}</td>
                             <td id="p-price" class="text-right">${products.price}</td>
@@ -33,6 +33,7 @@ export function Bill(products){
 
         <div class="row mt-4">
             <div class="col-md-12 text-center">
+                <button id="reomove-order" class="btn btn-primary">Remove Order</button>
                 <button id="order" class="btn btn-primary">Place Order</button>
             </div>
         </div>
